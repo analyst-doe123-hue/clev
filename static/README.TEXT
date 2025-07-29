@@ -1,0 +1,20 @@
+# Student Portfolio Web App
+
+## 📌 Description
+A Flask-based web application that allows users to:
+- Search students by admission number.
+- View student bio and profile picture.
+- Upload and view student-specific photo galleries.
+- Navigate between student info, result slip, and pictorials.
+
+## 📁 Folder Structure
+- `app.py` - main Flask app.
+- `edited_students.csv` - student data file.
+- `static/` - images, CSS styles.
+- `templates/` - HTML templates.
+
+## 🚀 How to Run
+
+1. Ensure Python 3.8+ is installed.
+2. Install Flask:
+

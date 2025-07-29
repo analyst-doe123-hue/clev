@@ -1,0 +1,183 @@
+/* =======================
+   Base & Theme Colors
+========================== */
+:root {
+    --maroon: #800000;
+    --light-maroon: #a94442;
+    --accent: #f8e6e6;
+    --background-light: #fff8f6;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-light);
+    color: #4b1c1c;
+}
+
+/* =======================
+   Navbar
+========================== */
+.navbar {
+    background-color: var(--maroon);
+}
+.navbar .navbar-brand,
+.navbar .nav-link {
+    color: white !important;
+}
+.navbar .nav-link:hover {
+    color: var(--accent) !important;
+}
+
+/* =======================
+   Typography
+========================== */
+h1, h2, h3, h4 {
+    color: var(--maroon);
+}
+.text-maroon {
+    color: var(--maroon) !important;
+}
+
+/* =======================
+   Buttons
+========================== */
+.btn-primary {
+    background-color: var(--maroon);
+    border: none;
+}
+.btn-primary:hover {
+    background-color: var(--light-maroon);
+}
+
+.btn-maroon {
+    background-color: var(--maroon);
+    color: white;
+    border: none;
+}
+.btn-maroon:hover {
+    background-color: var(--light-maroon);
+    color: white;
+}
+
+.btn-outline-maroon {
+    color: var(--maroon);
+    border: 1px solid var(--maroon);
+    background: transparent;
+}
+.btn-outline-maroon:hover {
+    background-color: var(--maroon);
+    color: white;
+}
+
+/* Floating Button */
+.btn-floating {
+    background-color: var(--maroon);
+    color: white;
+    border-radius: 50%;
+    padding: 20px;
+    margin: 10px;
+    width: 60px;
+    height: 60px;
+    font-size: 16px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.3s;
+}
+.btn-floating:hover {
+    background-color: var(--light-maroon);
+    transform: scale(1.1);
+}
+
+/* =======================
+   Forms & Inputs
+========================== */
+input, textarea, select {
+    border: 1px solid var(--maroon);
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+}
+form label {
+    font-weight: bold;
+    color: var(--maroon);
+}
+
+/* =======================
+   Cards & Student Boxes
+========================== */
+.card {
+    border: 1px solid var(--maroon);
+    box-shadow: 0 2px 5px rgba(128, 0, 0, 0.1);
+}
+.student-card {
+    transition: transform 0.2s ease-in-out;
+}
+.student-card:hover {
+    transform: scale(1.02);
+}
+
+/* =======================
+   Gallery
+========================== */
+.gallery-img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border: 3px solid var(--maroon);
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+/* =======================
+   Department Buttons
+========================== */
+.department-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+}
+.department-buttons a {
+    text-decoration: none;
+    color: white;
+    background-color: var(--maroon);
+    padding: 15px 25px;
+    border-radius: 50px;
+    transition: 0.3s ease-in-out;
+    font-weight: bold;
+}
+.department-buttons a:hover {
+    background-color: var(--light-maroon);
+    transform: scale(1.05);
+}
+
+/* =======================
+   Footer
+========================== */
+footer {
+    background-color: var(--maroon);
+    color: white;
+    text-align: center;
+    padding: 20px 10px;
+}
+
+/* =======================
+   Responsive Design
+========================== */
+@media screen and (max-width: 768px) {
+    .btn-floating {
+        width: 50px;
+        height: 50px;
+        padding: 15px;
+        font-size: 14px;
+    }
+
+    .department-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}

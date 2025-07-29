@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Gallery</h1>
+        <a href="{{ url_for('index') }}">Home</a>
+    </header>
+    <main>
+        <section class="gallery">
+            {% for upload in uploads %}
+                <div class="gallery-item">
+                    <img src="{{ url_for('static', filename='images/gallery_uploads/' + upload.filename) }}" alt="{{ upload.filename }}">
+                    <p>{{ upload.note }}</p>
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Daisy Portal</p>
+    </footer>
+</body>
+</html>

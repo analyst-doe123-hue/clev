@@ -1,0 +1,31 @@
+<!-- ...existing code... -->
+  </div>
+  <script>
+    // Change background color to maroon
+    document.body.style.backgroundColor = "#800000";
+
+    // Change all buttons to maroon and add hover effect
+    document.querySelectorAll('.btn').forEach(function(btn) {
+      btn.style.backgroundColor = "#800000";
+      btn.style.color = "#fff";
+      btn.style.border = "none";
+      btn.style.boxShadow = "0 2px 8px rgba(128,0,0,0.2)";
+      btn.addEventListener('mouseover', function() {
+        btn.style.backgroundColor = "#a83232";
+      });
+      btn.addEventListener('mouseout', function() {
+        btn.style.backgroundColor = "#800000";
+      });
+    });
+
+    // Change heading color to maroon accent
+    document.querySelector('h1').style.color = "#a83232";
+  </script>
+  <style>
+    .btn:focus {
+      outline: 2px solid #a83232 !important;
+      box-shadow: 0 0 0 0.2rem rgba(128,0,0,.25) !important;
+    }
+  </style>
+</body>
+</html>

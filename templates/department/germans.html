@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary">🇩🇪 German Sponsored Students</h2>
+    <form method="POST" action="{{ url_for('search') }}">
+        <div class="input-group mt-4">
+            <input type="text" name="adm_no" class="form-control" placeholder="Enter Admission Number" required>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.env/
+
+# OS Files
+.DS_Store
+
+# Logs & other
+*.log
+*.sqlite3

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ dept }} Department Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ dept }} Department</h1>
+        <a href="{{ url_for('index') }}">Home</a>
+    </header>
+    <main>
+        <h2>Search for a Student</h2>
+        <form method="POST">
+            <input type="text" name="adm_no" placeholder="Enter Admission Number" required>
+            <button type="submit">Search</button>
+        </form>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <h3>Students in {{ dept }}</h3>
+        <ul>
+            {% for adm, student in student.items() %}
+                <li>
+                    <a href="{{ url_for('profile', adm_no=adm) }}">{{ student['Name'] }}</a> - {{ student['Admission Number'] }}
+                </li>
+            {% endfor %}
+        </ul>
+    </main>
+    <footer>
+        <p>&copy; 2023 Daisy Portal</p>
+    </footer>
+</body>
+</html>

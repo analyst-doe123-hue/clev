@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daisy Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Daisy Portal</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                <li><a href="{{ url_for('departments') }}">Departments</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Search for Student</h2>
+            <form action="{{ url_for('search') }}" method="POST">
+                <label for="adm_no">Admission Number:</label>
+                <input type="text" id="adm_no" name="adm_no" required>
+                <button type="submit">Search</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Daisy Portal. All rights reserved.</p>
+    </footer>
+</body>
+</html>
