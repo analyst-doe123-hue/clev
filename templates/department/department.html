@@ -1,31 +1,43 @@
-<!-- ...existing code... -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container text-center py-5">
+  <h1 class="mb-4">Select a Department</h1>
+
+  <div class="department-buttons">
+    <a href="{{ url_for('department', dept_name='germans') }}" class="btn btn-lg btn-primary">Germans</a>
+    <a href="{{ url_for('department', dept_name='italians') }}" class="btn btn-lg btn-primary">Italians</a>
+    <a href="{{ url_for('department', dept_name='education') }}" class="btn btn-lg btn-primary">Education for Generations</a>
+    <a href="{{ url_for('department', dept_name='warmhearted') }}" class="btn btn-lg btn-primary">Warmhearted Group</a>
+    <a href="{{ url_for('department', dept_name='assisted') }}" class="btn btn-lg btn-primary">Assisted Group</a>
   </div>
-  <script>
-    // Change background color to maroon
+
+  <div class="mt-5">
+    <a href="{{ url_for('index') }}" class="btn btn-outline-light">🏠 Back to Home</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
     document.body.style.backgroundColor = "#800000";
 
-    // Change all buttons to maroon and add hover effect
-    document.querySelectorAll('.btn').forEach(function(btn) {
+    document.querySelectorAll('.btn').forEach(function (btn) {
       btn.style.backgroundColor = "#800000";
       btn.style.color = "#fff";
       btn.style.border = "none";
       btn.style.boxShadow = "0 2px 8px rgba(128,0,0,0.2)";
-      btn.addEventListener('mouseover', function() {
+      btn.addEventListener('mouseover', function () {
         btn.style.backgroundColor = "#a83232";
       });
-      btn.addEventListener('mouseout', function() {
+      btn.addEventListener('mouseout', function () {
         btn.style.backgroundColor = "#800000";
       });
     });
 
-    // Change heading color to maroon accent
-    document.querySelector('h1').style.color = "#a83232";
-  </script>
-  <style>
-    .btn:focus {
-      outline: 2px solid #a83232 !important;
-      box-shadow: 0 0 0 0.2rem rgba(128,0,0,.25) !important;
-    }
-  </style>
-</body>
-</html>
+    const h1 = document.querySelector('h1');
+    if (h1) h1.style.color = "#f8e6e6";
+  });
+</script>
+{% endblock %}

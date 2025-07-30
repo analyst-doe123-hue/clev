@@ -166,6 +166,27 @@ footer {
 }
 
 /* =======================
+   Toast Notification
+========================== */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1055;
+}
+.toast {
+    background-color: var(--maroon);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(128, 0, 0, 0.3);
+}
+.toast .btn-close {
+    color: white;
+    filter: invert(1);
+}
+
+/* =======================
    Responsive Design
 ========================== */
 @media screen and (max-width: 768px) {
