@@ -1,10 +1,12 @@
 Admission Number,Subject,Score
-12345,Mathematics,85
-12345,English,90
-12345,Science,78
-67890,Mathematics,88
-67890,English,92
-67890,Science,81
-54321,Mathematics,75
-54321,English,80
-54321,Science,70
+ADM001,Mathematics,85
+ADM001,English,78
+ADM001,Chemistry,92
+ADM002,Mathematics,73
+ADM002,English,81
+ADM002,Physics,79
+ADM004,Mathematics,88
+ADM004,English,75
+ADM004,Physics,81
+ADM004,Chemistry,79
+ADM004,Biology,85

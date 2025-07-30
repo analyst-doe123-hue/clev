@@ -1,35 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daisy Portal</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Welcome to Daisy Portal</h1>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('index') }}">Home</a></li>
-                <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
-                <li><a href="{{ url_for('departments') }}">Departments</a></li>
-                <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section>
-            <h2>Search for Student</h2>
-            <form action="{{ url_for('search') }}" method="POST">
-                <label for="adm_no">Admission Number:</label>
-                <input type="text" id="adm_no" name="adm_no" required>
-                <button type="submit">Search</button>
-            </form>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 Daisy Portal. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Welcome | Daisy Sponsored Students{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <img src="static/images/daisy_logo.png" class="mb-4" style="max-height: 120px;" alt="Daisy Logo">
+    <h1 class="fw-bold text-maroon mb-3">Welcome to Daisy Sponsored Students Portal</h1>
+    <p class="lead mb-4">Click on a department below to search students by sponsorship group.</p>
+
+    <!-- Department Floating Buttons -->
+    <div class="department-buttons">
+        <a href="{{ url_for('department', dept_name='germans') }}">Germans</a>
+        <a href="{{ url_for('department', dept_name='italians') }}">Italians</a>
+        <a href="{{ url_for('department', dept_name='education') }}">Education for Generation</a>
+        <a href="{{ url_for('department', dept_name='warmhearted') }}">Warmhearted Group</a>
+        <a href="{{ url_for('department', dept_name='assisted') }}">Assisted Group</a>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- Contact Form -->
+<div class="card p-4 shadow-sm mx-auto" style="max-width: 600px;">
+    <h2 class="mb-3 text-center">Contact Us</h2>
+    {% if success %}
+        <div class="alert alert-success">{{ success }}</div>
+    {% elif error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="{{ url_for('contact') }}">
+        <div class="mb-3">
+            <label for="email">Your Email</label>
+            <input type="email" name="email" class="form-control" required placeholder="example@example.com">
+        </div>
+        <div class="mb-3">
+            <label for="message">Message</label>
+            <textarea name="message" rows="4" class="form-control" required placeholder="Write your message here..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+    </form>
+</div>
+{% endblock %}
