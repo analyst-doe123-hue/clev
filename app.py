@@ -135,10 +135,10 @@ def contact():
             mail = EmailMessage()
             mail['Subject']="Message from Daisy Portal"
             mail['From']='your_email@gmail.com'
-            mail['To']='recipient@example.com'
+            mail['To']='gaylordndenga4@gmail.com'
             mail.set_content(f"From: {e}\n\n{m}")
             with smtplib.SMTP_SSL('smtp.gmail.com',465) as smtp:
-                smtp.login('gaylordndenga4@gmail.com','your_app_password')
+                smtp.login('gaylordndenga4@gmail.com','QWERTYUIOPtzboliw')
                 smtp.send_message(mail)
             msg=('success',"Message sent successfully!")
         except Exception as ex:
