@@ -19,6 +19,9 @@
             <a class="nav-link" href="{{ url_for('results', adm_no=student['Admission Number']) }}">Results</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('view_letter', adm_no=student['Admission Number']) }}">Letter</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="/">Back to Search</a>
           </li>
         </ul>
@@ -31,7 +34,9 @@
       <div class="col-md-8">
         <div class="card mb-4 shadow">
           <div class="card-body text-center">
-            <img src="{{ url_for('static', filename=student['Photo'].replace('static/', '')) }}" class="img-thumbnail mb-3" width="200">
+            <img src="{{ url_for('static', filename=student['Photo'].replace('static/', '')) }}"
+                 class="img-thumbnail mb-3"
+                 style="width: 200px; height: 200px; object-fit: cover;">
             <h3>{{ student["Full Name"] }}</h3>
             <p class="text-muted">{{ student["Admission Number"] }}</p>
             <hr>
@@ -41,6 +46,9 @@
             <p><strong>Place of Residence:</strong> {{ student["Place of Residence"] }}</p>
             <p><strong>Parent/Guardian:</strong> {{ student["Parent/Guardian Name"] }}</p>
             <p><strong>Contact:</strong> {{ student["Contact"] }}</p>
+            <p><strong>School:</strong>{{student["school"]}}</p>
+            <p><strong>Career:</strong>{{student["career aspiration"]}}</p>
+            
           </div>
         </div>
       </div>
