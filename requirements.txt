@@ -1,3 +1,34 @@
-flask
-gunicorn
 
+# Flask and WSGI server
+Flask==3.0.3
+gunicorn==21.2.0
+
+# Template rendering and utilities
+Jinja2==3.1.4
+itsdangerous==2.2.0
+Werkzeug==3.0.3
+click==8.1.7
+
+# Cloudinary file storage
+cloudinary==1.40.0
+
+# CSV handling
+pandas==2.2.2
+
+# File uploads
+python-dotenv==1.0.1
+
+# Email sending (SMTP)
+Flask-Mail==0.9.1
+
+# Testing
+pytest==8.3.3
+
+# For parsing and working with dates (optional, but common)
+python-dateutil==2.9.0.post0
+
+# For image type checking (optional but useful for uploads)
+Pillow==10.4.0
+
+# Security (optional but recommended)
+Flask-Cors==4.0.1
