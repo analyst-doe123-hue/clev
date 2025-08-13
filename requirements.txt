@@ -1,21 +1,16 @@
 # Web framework
 Flask==3.0.3
 Werkzeug==3.0.3
+Jinja2==3.1.4
+click==8.1.7
+itsdangerous==2.2.0
+MarkupSafe==2.1.5
 
-# File uploads + environment
-python-dotenv==1.0.1
-
-# Cloudinary integration
-cloudinary==1.41.0
-
-# Data handling
-pandas==2.2.2
-
-# Deployment
+# Server
 gunicorn==22.0.0
 
-# Testing
-pytest==8.2.2
+# Env vars
+python-dotenv==1.0.1
 
-# Security
-Flask-Cors==4.0.1
+# Cloudinary (uploads)
+cloudinary==1.41.0

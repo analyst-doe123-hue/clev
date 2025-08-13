@@ -15,3 +15,5 @@ venv/
 # Logs & other
 *.log
 *.sqlite3
+.env
+.venv/

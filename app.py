@@ -1,75 +1,84 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-import csv, os
-from werkzeug.utils import secure_filename
+# app.py
+import os
+import csv
 import smtplib
 from email.message import EmailMessage
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from werkzeug.utils import secure_filename
 import cloudinary
 import cloudinary.uploader
+from dotenv import load_dotenv
+import os
+
+# Load .env in local dev; Render ignores it and uses dashboard variables
+load_dotenv()
+# Example usage
+CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASS = os.getenv("EMAIL_PASS")
+STUDENTS_CSV = os.getenv("STUDENTS_CSV", "edited_students.csv")
+RESULTS_CSV = os.getenv("RESULTS_CSV", "results.csv")
+
+# Persistent data dir (Render Persistent Disk or local folder)
+DATA_DIR = os.getenv("DATA_DIR", ".")
+os.makedirs(DATA_DIR, exist_ok=True)
+RESULTS_CSV = os.path.join(DATA_DIR, "results.csv")
+EDITED_STUDENTS_CSV = os.path.join(DATA_DIR, "edited_students.csv")
+
+# Cloudinary config: prefer CLOUDINARY_URL if set, fallback to discrete vars
+if os.getenv("CLOUDINARY_URL"):
+    cloudinary.config(cloudinary_url=os.getenv("CLOUDINARY_URL"))
+else:
+    cloudinary.config(
+        cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.getenv("CLOUDINARY_API_KEY"),
+        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+        secure=True,
+    )
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'
+app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-
-# Cloudinary config
-cloudinary.config(
-    cloud_name='dbdchnnei',
-    api_key='641414359882347',
-    api_secret='XToITayCxZ5FNIWSqjQS_5WmB4o'
-)
 
 # Global in-memory storage
 students_data = {}
 uploads = []
-result_links = {}   # kept for backward compatibility if used elsewhere
+result_links = {}
 letter_links = {}
 
-RESULTS_CSV = "results.csv"
-
 # ----------------------
-# Helper: students
+# Helpers
 # ----------------------
 def load_students():
-    """Load students.csv into students_data dict keyed by Admission Number (UPPER)."""
-    if not os.path.exists('students.csv'):
+    path = os.path.join(DATA_DIR, "students.csv")
+    if not os.path.exists(path):
         return
-    with open('students.csv', newline='', encoding='utf-8') as f:
+    with open(path, newline='', encoding='utf-8') as f:
         for row in csv.DictReader(f):
             adm = row.get('Admission Number', '').strip().upper()
             if adm:
                 students_data[adm] = row
 
-# ----------------------
-# Helpers: results CSV
-# ----------------------
 def load_results():
-    """
-    Return a list of result dicts read from RESULTS_CSV.
-    Each dict has keys: "Admission Number", "url", "public_id", "note"
-    """
     if not os.path.exists(RESULTS_CSV):
         return []
     with open(RESULTS_CSV, newline='', encoding='utf-8') as f:
         return list(csv.DictReader(f))
 
 def save_results(results_list):
-    """
-    Write the list of dicts to RESULTS_CSV with the header:
-    Admission Number,url,public_id,note
-    """
-    # Ensure consistent fieldnames
     fieldnames = ["Admission Number", "url", "public_id", "note"]
     with open(RESULTS_CSV, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for row in results_list:
-            # Normalize keys to ensure writer doesn't fail
-            out = {
+            writer.writerow({
                 "Admission Number": row.get("Admission Number", ""),
                 "url": row.get("url", ""),
                 "public_id": row.get("public_id", ""),
                 "note": row.get("note", "")
-            }
-            writer.writerow(out)
+            })
 
 # ----------------------
 # Routes
@@ -88,7 +97,6 @@ def profile(adm_no):
     st = students_data.get(adm_no)
     if not st:
         return redirect(url_for('index'))
-    # textual academic results from separate CSV (unchanged)
     results = [r for r in load_results() if r["Admission Number"] == adm_no]
     return render_template('profile.html', student=st, results=results)
 
@@ -122,50 +130,26 @@ def results(adm_no):
     student = students_data.get(adm_no)
     if not student:
         return redirect(url_for('index'))
-    # load all result image records for this student
     all_results = load_results()
     student_results = [r for r in all_results if r["Admission Number"].strip().upper() == adm_no]
-    # template expects variable name result_images (per your results.html)
-    # We'll shape each item to have url, public_id, note, filename (optional)
-    result_images = []
-    for r in student_results:
-        url = r.get('url', '')
-        public_id = r.get('public_id', '')
-        note = r.get('note', '')
-        filename = url.split('/')[-1] if url else ''
-        result_images.append({
-            'url': url,
-            'public_id': public_id,
-            'note': note,
-            'filename': filename
-        })
+    result_images = [{
+        'url': r.get('url', ''),
+        'public_id': r.get('public_id', ''),
+        'note': r.get('note', ''),
+        'filename': r.get('url', '').split('/')[-1] if r.get('url') else ''
+    } for r in student_results]
     return render_template('results.html', student=student, results=[], result_images=result_images)
 
 @app.route("/upload_result_file/<adm_no>", methods=["POST"])
 def upload_result_file(adm_no):
-    """
-    Accept multiple image files from input name="result_file"
-    Upload each to Cloudinary under folder results/<adm_no>/
-    Save metadata (Admission Number, url, public_id, note) to results.csv
-    """
-    # The form field used in your results.html is "result_file" (multiple)
     uploaded_files = request.files.getlist("result_file")
     note = request.form.get("note", "")
-
     if not uploaded_files or all(f.filename == "" for f in uploaded_files):
         flash("No files selected", "error")
         return redirect(url_for("results", adm_no=adm_no))
-
     results = load_results()
-
     for file in uploaded_files:
-        if file and file.filename:
-            # Optional: validate image filetypes by extension
-            filename = file.filename.lower()
-            if not any(filename.endswith(ext) for ext in ('.jpg', '.jpeg', '.png', '.gif', '.webp')):
-                # skip non-image files
-                continue
-
+        if file and file.filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
             upload = cloudinary.uploader.upload(file, folder=f"results/{adm_no}")
             results.append({
                 "Admission Number": adm_no,
@@ -173,34 +157,23 @@ def upload_result_file(adm_no):
                 "public_id": upload.get("public_id", ""),
                 "note": note
             })
-
     save_results(results)
     flash("Files uploaded successfully", "success")
     return redirect(url_for("results", adm_no=adm_no))
 
 @app.route('/delete_file', methods=['POST'])
 def delete_file():
-    """
-    Generic AJAX delete endpoint used by gallery, results, letters.
-    Expects JSON: { adm_no, public_id, type } where type is 'letter', 'result', or 'gallery'
-    """
     data = request.get_json()
     adm_no = data.get('adm_no', '').strip().upper()
     public_id = data.get('public_id', '')
     file_type = data.get('type', '')
-
     if not public_id:
         return jsonify({"success": False, "error": "Missing data"}), 400
-
     try:
-        # For letter files we uploaded as raw; for images we used default image resource type.
         if file_type == 'letter':
             cloudinary.uploader.destroy(public_id, resource_type='raw')
         else:
-            # image/result/gallery => default resource_type (image)
             cloudinary.uploader.destroy(public_id)
-
-        # remove from server-side stores
         if file_type == 'letter' and adm_no in letter_links:
             letter_links[adm_no] = [f for f in letter_links[adm_no] if f['public_id'] != public_id]
         elif file_type == 'result':
@@ -210,22 +183,18 @@ def delete_file():
         elif file_type == 'gallery':
             global uploads
             uploads = [f for f in uploads if f.get('public_id') != public_id]
-
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-# Letter route (multiple uploads already present)
 @app.route('/letter/<adm_no>', methods=['GET', 'POST'])
 def view_letter(adm_no):
     student = students_data.get(adm_no)
     if not student:
         return redirect(url_for('index'))
-
     if request.method == 'POST':
         files = request.files.getlist('letter_file')
         note = request.form.get('note', '')
-
         for file in files:
             if file and file.filename.lower().endswith(('.pdf', '.docx')):
                 result = cloudinary.uploader.upload(file, folder=f"letters/{adm_no}/", resource_type='raw')
@@ -235,16 +204,11 @@ def view_letter(adm_no):
                     'filename': file.filename,
                     'public_id': result['public_id']
                 }
-                if adm_no not in letter_links:
-                    letter_links[adm_no] = []
-                letter_links[adm_no].append(entry)
-
+                letter_links.setdefault(adm_no, []).append(entry)
         flash(f"{len(files)} letter(s) uploaded successfully.")
-
     letters = letter_links.get(adm_no, [])
     return render_template('letter.html', student=student, letters=letters)
 
-# Departments, contact, update_bio keep as before
 @app.route('/departments')
 def departments():
     return render_template('department/department.html')
@@ -259,10 +223,7 @@ def department(dept_name):
         'assisted': 'Assisted Group'
     }
     section = dept_map.get(dept_name, 'Department')
-    filtered = {
-        adm: st for adm, st in students_data.items()
-        if st.get('Department', '').strip().lower() == section.lower()
-    }
+    filtered = {adm: st for adm, st in students_data.items() if st.get('Department', '').strip().lower() == section.lower()}
     error = None
     if request.method == 'POST':
         adm = request.form.get('adm_no', '').strip().upper()
@@ -281,11 +242,11 @@ def contact():
         try:
             mail = EmailMessage()
             mail['Subject'] = "Message from Daisy Portal"
-            mail['From'] = 'your_email@gmail.com'
-            mail['To'] = 'recipient@example.com'
+            mail['From'] = os.getenv("EMAIL_FROM", "your_email@gmail.com")
+            mail['To'] = os.getenv("EMAIL_TO", "recipient@example.com")
             mail.set_content(f"From: {e}\n\n{m}")
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                smtp.login('gaylordndenga4@gmail.com', 'your_app_password')
+                smtp.login(os.getenv("EMAIL_FROM"), os.getenv("EMAIL_PASSWORD"))
                 smtp.send_message(mail)
             msg = ('success', "Message sent successfully!")
         except Exception as ex:
@@ -298,18 +259,18 @@ def update_bio():
     adm_no = data.get('adm_no', '').strip().upper()
     new_bio = data.get('biography', '').strip()
     updated = False
-
     rows = []
-    with open('edited_students.csv', newline='', encoding='utf-8') as f:
+    if not os.path.exists(EDITED_STUDENTS_CSV):
+        return 'Student not found', 404
+    with open(EDITED_STUDENTS_CSV, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row['Admission Number'].strip().upper() == adm_no:
                 row['Small Biography'] = new_bio
                 updated = True
             rows.append(row)
-
     if updated:
-        with open('edited_students.csv', 'w', newline='', encoding='utf-8') as f:
+        with open(EDITED_STUDENTS_CSV, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=rows[0].keys())
             writer.writeheader()
             writer.writerows(rows)
@@ -318,8 +279,8 @@ def update_bio():
     else:
         return 'Student not found', 404
 
-# Load students on start
+# Load data on startup
 load_students()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)

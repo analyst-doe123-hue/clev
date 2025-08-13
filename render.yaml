@@ -3,17 +3,28 @@ services:
     name: student-portfolio
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DATA_DIR
+        value: /data
+      # Cloudinary settings (keep them secret in Render's Environment tab)
       - key: CLOUDINARY_URL
-        sync: false   # Set in Render Dashboard
-      - key: FLASK_ENV
-        value: production
-      - key: SECRET_KEY
         sync: false
-    autoDeploy: true
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Email credentials
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
     disk:
-      name: uploads
-      mountPath: /mnt/data
+      name: data
+      mountPath: /data
       sizeGB: 1
