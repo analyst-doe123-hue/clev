@@ -2,6 +2,7 @@
 import os
 import csv
 import smtplib
+import sqlite3
 from email.message import EmailMessage
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from werkzeug.utils import secure_filename
@@ -11,7 +12,6 @@ import cloudinary.uploader
 # ----------------------
 # Hard-coded configuration
 # ----------------------
-# Cloudinary: using direct credentials
 cloudinary.config(
     cloud_name='dbdchnnei',
     api_key='641414359882347',
@@ -19,7 +19,6 @@ cloudinary.config(
     secure=True
 )
 
-# Email config (hard-code if you want, or keep env for security)
 EMAIL_USER = "your_email@gmail.com"
 EMAIL_PASS = "your_email_password"
 EMAIL_FROM = "your_email@gmail.com"
@@ -29,7 +28,8 @@ EMAIL_TO = "recipient@example.com"
 DATA_DIR = "."
 os.makedirs(DATA_DIR, exist_ok=True)
 RESULTS_CSV = os.path.join(DATA_DIR, "results.csv")
-EDITED_STUDENTS_CSV = os.path.join(DATA_DIR, "edited_students.csv")
+STUDENTS_CSV = os.path.join(DATA_DIR, "students.csv")
+DB_PATH = os.path.join(DATA_DIR, "students.db")
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -43,10 +43,43 @@ uploads = []
 letter_links = {}
 
 # ----------------------
-# Helpers
+# SQLite Helpers (for biography)
+# ----------------------
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS biographies (
+            adm_no TEXT PRIMARY KEY,
+            biography TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+def get_bio(adm_no):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT biography FROM biographies WHERE adm_no=?", (adm_no,))
+    row = c.fetchone()
+    conn.close()
+    return row[0] if row else None
+
+def save_bio(adm_no, biography):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO biographies (adm_no, biography) VALUES (?, ?)
+        ON CONFLICT(adm_no) DO UPDATE SET biography=excluded.biography
+    ''', (adm_no, biography))
+    conn.commit()
+    conn.close()
+
+# ----------------------
+# CSV Helpers (results & students)
 # ----------------------
 def load_students():
-    path = os.path.join(DATA_DIR, "students.csv")
+    path = STUDENTS_CSV
     if not os.path.exists(path):
         return
     with open(path, newline='', encoding='utf-8') as f:
@@ -91,6 +124,12 @@ def profile(adm_no):
     st = students_data.get(adm_no)
     if not st:
         return redirect(url_for('index'))
+    
+    # Override CSV biography with SQLite biography if available
+    bio = get_bio(adm_no)
+    if bio:
+        st['Small Biography'] = bio
+
     results = [r for r in load_results() if r["Admission Number"] == adm_no]
     return render_template('profile.html', student=st, results=results)
 
@@ -252,30 +291,22 @@ def update_bio():
     data = request.get_json()
     adm_no = data.get('adm_no', '').strip().upper()
     new_bio = data.get('biography', '').strip()
-    updated = False
-    rows = []
-    if not os.path.exists(EDITED_STUDENTS_CSV):
-        return 'Student not found', 404
-    with open(EDITED_STUDENTS_CSV, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            if row['Admission Number'].strip().upper() == adm_no:
-                row['Small Biography'] = new_bio
-                updated = True
-            rows.append(row)
-    if updated:
-        with open(EDITED_STUDENTS_CSV, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=rows[0].keys())
-            writer.writeheader()
-            writer.writerows(rows)
+
+    if not adm_no or not new_bio:
+        return 'Missing data', 400
+    
+    save_bio(adm_no, new_bio)
+
+    # Update in-memory student record for immediate reflection
+    if adm_no in students_data:
         students_data[adm_no]['Small Biography'] = new_bio
-        return '', 204
-    else:
-        return 'Student not found', 404
+
+    return '', 204
 
 # ----------------------
 # Load data on startup
 # ----------------------
+init_db()
 load_students()
 
 if __name__ == '__main__':
