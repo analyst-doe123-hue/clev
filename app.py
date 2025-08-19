@@ -7,45 +7,39 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from werkzeug.utils import secure_filename
 import cloudinary
 import cloudinary.uploader
-from dotenv import load_dotenv
-import os
 
-# Load .env in local dev; Render ignores it and uses dashboard variables
-load_dotenv()
-# Example usage
-CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
-EMAIL_USER = os.getenv("EMAIL_USER")
-EMAIL_PASS = os.getenv("EMAIL_PASS")
-STUDENTS_CSV = os.getenv("STUDENTS_CSV", "edited_students.csv")
-RESULTS_CSV = os.getenv("RESULTS_CSV", "results.csv")
+# ----------------------
+# Hard-coded configuration
+# ----------------------
+# Cloudinary: using direct credentials
+cloudinary.config(
+    cloud_name='dbdchnnei',
+    api_key='641414359882347',
+    api_secret='XToITayCxZ5FNIWSqjQS_5WmB4o',
+    secure=True
+)
 
-# Persistent data dir (Render Persistent Disk or local folder)
-DATA_DIR = os.getenv("DATA_DIR", ".")
+# Email config (hard-code if you want, or keep env for security)
+EMAIL_USER = "your_email@gmail.com"
+EMAIL_PASS = "your_email_password"
+EMAIL_FROM = "your_email@gmail.com"
+EMAIL_TO = "recipient@example.com"
+
+# File paths
+DATA_DIR = "."
 os.makedirs(DATA_DIR, exist_ok=True)
 RESULTS_CSV = os.path.join(DATA_DIR, "results.csv")
 EDITED_STUDENTS_CSV = os.path.join(DATA_DIR, "edited_students.csv")
 
-# Cloudinary config: prefer CLOUDINARY_URL if set, fallback to discrete vars
-if os.getenv("CLOUDINARY_URL"):
-    cloudinary.config(cloudinary_url=os.getenv("CLOUDINARY_URL"))
-else:
-    cloudinary.config(
-        cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-        api_key=os.getenv("CLOUDINARY_API_KEY"),
-        api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-        secure=True,
-    )
-
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
+app.secret_key = "supersecretkey"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
+# ----------------------
 # Global in-memory storage
+# ----------------------
 students_data = {}
 uploads = []
-result_links = {}
 letter_links = {}
 
 # ----------------------
@@ -242,11 +236,11 @@ def contact():
         try:
             mail = EmailMessage()
             mail['Subject'] = "Message from Daisy Portal"
-            mail['From'] = os.getenv("EMAIL_FROM", "your_email@gmail.com")
-            mail['To'] = os.getenv("EMAIL_TO", "recipient@example.com")
+            mail['From'] = EMAIL_FROM
+            mail['To'] = EMAIL_TO
             mail.set_content(f"From: {e}\n\n{m}")
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-                smtp.login(os.getenv("EMAIL_FROM"), os.getenv("EMAIL_PASSWORD"))
+                smtp.login(EMAIL_FROM, EMAIL_PASS)
                 smtp.send_message(mail)
             msg = ('success', "Message sent successfully!")
         except Exception as ex:
@@ -279,8 +273,10 @@ def update_bio():
     else:
         return 'Student not found', 404
 
+# ----------------------
 # Load data on startup
+# ----------------------
 load_students()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
