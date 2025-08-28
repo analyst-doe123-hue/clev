@@ -1,22 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-4">
-  <h3 class="mb-3">Gallery - {{ student["Full Name"] }}</h3>
+  <h3 class="mb-3">🖼️ Gallery - {{ student["Full Name"] }}</h3>
+
+  <!-- Navbar -->
+  <nav class="mb-4">
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('profile', adm_no=student['Admission Number']) }}">👤 Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('gallery', adm_no=student['Admission Number']) }}">🖼️ Gallery</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('results', adm_no=student['Admission Number']) }}">📊 Results</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('letter', adm_no=student['Admission Number']) }}">✉️ Letters</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Upload Form -->
   <form method="POST" enctype="multipart/form-data" class="mb-4">
-    <input type="file" name="gallery_file" class="form-control mb-2" accept="image/*" multiple required>
-    <input type="text" name="note" class="form-control mb-2" placeholder="Photo note (applies to all selected)">
-    <button type="submit" class="btn btn-maroon">Upload</button>
+    <div class="row g-2">
+      <div class="col-md-6">
+        <input type="file" name="gallery_file" class="form-control" accept="image/*" multiple required>
+      </div>
+      <div class="col-md-6">
+        <input type="text" name="note" class="form-control" placeholder="Photo note (applies to all selected)">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-maroon mt-2">Upload</button>
   </form>
 
-  <div class="d-flex flex-wrap">
+  <!-- Gallery Display -->
+  <div class="row">
     {% for up in uploads %}
-      <div class="me-3 mb-3 text-center">
-        <img src="{{ up.url }}" class="gallery-img rounded shadow" style="width: 200px; height: auto;">
-        <p class="mt-2">{{ up.note }}</p>
-        <button class="btn btn-sm btn-danger" onclick="deleteFile('{{ student['Admission Number'] }}', '{{ up.public_id }}', 'gallery', this)">🗑️</button>
+      <div class="col-md-3 col-sm-6 mb-4 text-center">
+        <div class="card shadow-sm h-100">
+          <img src="{{ up.url }}" class="card-img-top gallery-img rounded" style="object-fit: cover; height: 200px;">
+          <div class="card-body p-2">
+            <p class="small mb-2">{{ up.note }}</p>
+            <button class="btn btn-sm btn-danger w-100" onclick="deleteFile('{{ student['Admission Number'] }}', '{{ up.public_id }}', 'gallery', this)">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
       </div>
     {% else %}
-      <p>No gallery images uploaded yet.</p>
+      <p class="text-muted">No gallery images uploaded yet.</p>
     {% endfor %}
   </div>
 </div>
@@ -32,7 +65,7 @@ function deleteFile(adm_no, public_id, type, btn) {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      btn.closest('div').remove();
+      btn.closest('.col-md-3').remove();
     } else {
       alert("Error: " + data.error);
     }

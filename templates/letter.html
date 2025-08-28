@@ -3,6 +3,24 @@
 <div class="container mt-5">
   <h3 class="mb-4">✉️ Letters to Sponsor - {{ student["Full Name"] }}</h3>
 
+  <!-- Navbar -->
+  <nav class="mb-4">
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('profile', adm_no=student['Admission Number']) }}">👤 Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('gallery', adm_no=student['Admission Number']) }}">🖼️ Gallery</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('results', adm_no=student['Admission Number']) }}">📊 Results</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="{{ url_for('letter', adm_no=student['Admission Number']) }}">✉️ Letters</a>
+      </li>
+    </ul>
+  </nav>
+
   <!-- Upload Form -->
   <div class="card shadow mb-4">
     <div class="card-body">

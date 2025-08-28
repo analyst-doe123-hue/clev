@@ -306,7 +306,7 @@ def upload_result_file(adm_no):
 
 # --------- Letters ----------
 @app.route('/letter/<adm_no>', methods=['GET', 'POST'])
-def view_letter(adm_no):
+def letter(adm_no):  # renamed from view_letter
     student = students_data.get(adm_no)
     if not student:
         flash('Student not found', 'error')
@@ -337,11 +337,10 @@ def view_letter(adm_no):
             flash(f"{count} letter(s) uploaded successfully.", 'success')
         else:
             flash('No valid letter files uploaded', 'error')
-        return redirect(url_for('view_letter', adm_no=adm_no))
+        return redirect(url_for('letter', adm_no=adm_no))  # updated
 
     letters = get_uploads(adm_no, 'letter')
     return render_template('letter.html', student=student, letters=letters)
-
 
 # --------- Delete Cloudinary + DB ----------
 @app.route('/delete_file', methods=['POST'])
