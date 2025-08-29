@@ -9,16 +9,50 @@ from werkzeug.utils import secure_filename
 import cloudinary
 import cloudinary.uploader
 from pathlib import Path
+from flask_sqlalchemy import SQLAlchemy
+app = Flask(__name__)
 
+app = Flask(__name__)
+
+# Database config: prefer Postgres, fallback to SQLite
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///students.db"
+)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# ----------------------------
+# Define your models here
+# ----------------------------
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    adm_no = db.Column(db.String(50), unique=True, nullable=False)
+    full_name = db.Column(db.String(100), nullable=False)
+    bio = db.Column(db.Text)
+    # add more fields as needed
+
+# ----------------------------
+# Routes
+# ----------------------------
+@app.route("/")
+def index():
+    return "Student Portfolio running!"
 # =====================================================
 # Configuration (use environment variables in production)
 # =====================================================
 # Core app
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-prod")
 MAX_CONTENT_MB = int(os.getenv("MAX_CONTENT_MB", "16"))
+# On Render, only /opt/render/project/src and /tmp are writable
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Database (attach a Render Disk and point DB_PATH there)
-DB_PATH = os.getenv("DB_PATH", "/var/data/students.db")  # falls back to local if missing
+# Prefer environment variable (if you attach a Render Disk later),
+# otherwise default to a safe project-local path.
+DB_PATH = os.getenv("DB_PATH", os.path.join(BASE_DIR, "students.db"))
+
+# Make sure the directory exists (only if not using /var/data without a disk)
 Path(os.path.dirname(DB_PATH) or ".").mkdir(parents=True, exist_ok=True)
 
 # CSV roster (unchanged – read-only)
