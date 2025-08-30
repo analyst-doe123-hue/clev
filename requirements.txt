@@ -5,3 +5,4 @@ cloudinary
 python-dotenv
 pandas
 Werkzeug
+Flask-SQLAlchemy
