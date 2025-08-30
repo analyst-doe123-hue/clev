@@ -8,6 +8,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from werkzeug.utils import secure_filename
 import cloudinary
 import cloudinary.uploader
+import cloudinary.api
+from dotenv import load_dotenv
+load_dotenv()  # this loads .env into environment variables
 from pathlib import Path
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
