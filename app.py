@@ -1,4 +1,5 @@
 # app.py
+# app.py
 import os
 import csv
 import smtplib
@@ -10,21 +11,60 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 from dotenv import load_dotenv
-load_dotenv()  # this loads .env into environment variables
 from pathlib import Path
 from flask_sqlalchemy import SQLAlchemy
-app = Flask(__name__)
 
-app = Flask(__name__)
+# =====================================================
+# Load environment variables
+# =====================================================
+load_dotenv()  # local .env; on Render, env vars are injected automatically
 
-# Database config: prefer Postgres, fallback to SQLite
+# =====================================================
+# Core configuration
+# =====================================================
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback_secret_key")
+MAX_CONTENT_MB = int(os.getenv("MAX_CONTENT_MB", "16"))
+
+# On Render, only /opt/render/project/src and /tmp are writable
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.getenv("DB_PATH", os.path.join(BASE_DIR, "students.db"))
+
+# Ensure DB directory exists (for local dev)
+Path(os.path.dirname(DB_PATH) or ".").mkdir(parents=True, exist_ok=True)
+
+# CSV roster (read-only)
+STUDENTS_CSV = os.getenv("STUDENTS_CSV", "students.csv")
+RESULTS_CSV = os.getenv("RESULTS_CSV", "results.csv")  # legacy migration only
+
+# Email (optional)
+EMAIL_FROM = os.getenv("EMAIL_FROM", "")
+EMAIL_PASS = os.getenv("EMAIL_PASS", "")
+EMAIL_TO = os.getenv("EMAIL_TO", "")
+
+# Cloudinary (REQUIRED for uploads)
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True,
+)
+
+# =====================================================
+# Flask app setup
+# =====================================================
+app = Flask(__name__)
+app.config["SECRET_KEY"] = SECRET_KEY
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_MB * 1024 * 1024
+
+# Database config: prefer Postgres (Render), fallback to SQLite (local)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
     "DATABASE_URL",
-    "sqlite:///students.db"
+    f"sqlite:///{DB_PATH}"
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
 
 # ----------------------------
 # Define your models here
@@ -480,3 +520,11 @@ migrate_results_csv_to_db()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', '5000')), debug=True)
+# =====================================================
+# Entry point
+# =====================================================
+if __name__ == "__main__":
+    # Local dev server
+    port = int(os.getenv("PORT", 5000))
+    debug = os.getenv("FLASK_DEBUG", "1") == "1"
+    app.run(host="0.0.0.0", port=port, debug=debug)
