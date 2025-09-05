@@ -26,7 +26,7 @@
     <div class="card-body">
       <form method="POST" enctype="multipart/form-data">
         <div class="mb-3">
-          <input type="file" name="letter_file" accept=".pdf,.docx" class="form-control" multiple required>
+          <input type="file" name="letter_file" accept="image/*" class="form-control" multiple required>
         </div>
         <div class="mb-3">
           <input type="text" name="note" class="form-control" placeholder="Optional note (applies to all selected)">
@@ -41,19 +41,30 @@
     <div class="card shadow mb-4">
       <div class="card-body">
         <h5>📁 Uploaded Letters</h5>
-        <ul class="list-group">
+        <div class="row g-3">
           {% for letter in letters %}
-            <li class="list-group-item d-flex justify-content-between align-items-start">
-              <div>
-                <a href="{{ letter.url }}" target="_blank">{{ letter.filename }}</a>
-                {% if letter.note %}
-                  <br><small><strong>Note:</strong> {{ letter.note }}</small>
-                {% endif %}
+            <div class="col-6 col-md-4 col-lg-3">
+              <div class="card h-100">
+                <img src="{{ letter.url }}" 
+                     class="card-img-top img-fluid letter-thumbnail" 
+                     style="height: 200px; object-fit: cover; cursor: pointer;"
+                     alt="Letter Image"
+                     data-index="{{ loop.index0 }}"
+                     data-img="{{ letter.url }}"
+                     data-note="{{ letter.note }}">
+                <div class="card-body p-2">
+                  {% if letter.note %}
+                    <p class="small mb-1"><strong>Note:</strong> {{ letter.note }}</p>
+                  {% endif %}
+                  <button class="btn btn-sm btn-danger w-100" 
+                          onclick="deleteFile('{{ student['Admission Number'] }}', '{{ letter.public_id }}', 'letter', this)">
+                          🗑️ Delete
+                  </button>
+                </div>
               </div>
-              <button class="btn btn-sm btn-danger" onclick="deleteFile('{{ student['Admission Number'] }}', '{{ letter.public_id }}', 'letter', this)">🗑️</button>
-            </li>
+            </div>
           {% endfor %}
-        </ul>
+        </div>
       </div>
     </div>
   {% else %}
@@ -61,7 +72,30 @@
   {% endif %}
 </div>
 
+<!-- Bootstrap Modal with navigation -->
+<div class="modal fade" id="letterModal" tabindex="-1" aria-labelledby="letterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="letterModalLabel">Letter Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" class="img-fluid rounded mb-2" alt="Letter Preview">
+        <p id="modalNote" class="mt-2 text-muted"></p>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" id="prevBtn">⬅ Prev</button>
+        <button type="button" class="btn btn-secondary" id="nextBtn">Next ➡</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+let currentIndex = 0;
+let letters = [];
+
 function deleteFile(adm_no, public_id, type, btn) {
   if (!confirm("Are you sure you want to delete this file?")) return;
   fetch('/delete_file', {
@@ -72,11 +106,53 @@ function deleteFile(adm_no, public_id, type, btn) {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      btn.closest('li').remove();
+      btn.closest('.col-6').remove();
     } else {
       alert("Error: " + data.error);
     }
   });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const thumbnails = document.querySelectorAll('.letter-thumbnail');
+  const modal = new bootstrap.Modal(document.getElementById('letterModal'));
+  const modalImage = document.getElementById('modalImage');
+  const modalNote = document.getElementById('modalNote');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  // Store letters in array
+  thumbnails.forEach((thumb, index) => {
+    letters.push({
+      url: thumb.getAttribute('data-img'),
+      note: thumb.getAttribute('data-note') || ''
+    });
+
+    // Open modal when clicked
+    thumb.addEventListener('click', () => {
+      currentIndex = index;
+      showLetter();
+      modal.show();
+    });
+  });
+
+  function showLetter() {
+    modalImage.src = letters[currentIndex].url;
+    modalNote.textContent = letters[currentIndex].note 
+      ? "Note: " + letters[currentIndex].note 
+      : "";
+  }
+
+  // Prev/Next navigation
+  prevBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + letters.length) % letters.length;
+    showLetter();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % letters.length;
+    showLetter();
+  });
+});
 </script>
 {% endblock %}

@@ -1,15 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Contact Us{% endblock %}
+
 {% block content %}
-<div class="mt-4 mx-auto" style="max-width:600px;">
-  <h2 class="text-center text-primary mb-3">Contact Us</h2>
-  {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
-  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-  <form method="POST">
-    <div class="mb-3"><label class="form-label">Your Email</label><input type="email" name="email"
-      class="form-control" required></div>
-    <div class="mb-3"><label class="form-label">Message</label><textarea name="message" rows="5" class="form-control"
-      required></textarea></div>
-    <button class="btn btn-primary">Send Message</button>
-  </form>
+<div class="container py-5">
+  <h1 class="text-center mb-4">Contact Us</h1>
+
+  {% if success %}
+    <div class="alert alert-success text-center">{{ success }}</div>
+  {% endif %}
+  {% if error %}
+    <div class="alert alert-danger text-center">{{ error }}</div>
+  {% endif %}
+
+  <div class="row">
+    <!-- Contact Info -->
+    <div class="col-md-6 mb-4">
+      <h3>Get in Touch</h3>
+      <p><strong>Email:</strong> gaylordndenga4@gmail.com</p>
+      <p><strong>Phone:</strong> +254 713 935 610</p>
+      <p><strong>Address:</strong> Daisy Sponsorship Program, Nairobi, Kenya</p>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="col-md-6">
+      <h3>Send us a Message</h3>
+      <form method="post" action="{{ url_for('contact') }}">
+        <div class="mb-3">
+          <label for="name" class="form-label">Your Name</label>
+          <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Your Email</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+          <label for="message" class="form-label">Message</label>
+          <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="background-color:#800000; border:none;">
+          Send
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}

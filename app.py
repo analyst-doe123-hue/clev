@@ -4,6 +4,15 @@ import os
 import csv
 import smtplib
 import sqlite3
+import io
+
+# Force matplotlib to use a non-Tkinter backend
+import matplotlib
+matplotlib.use("Agg")  # prevents Tkinter errors in Flask
+
+import matplotlib.pyplot as plt
+from flask import Response
+import pandas as pd
 from email.message import EmailMessage
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from werkzeug.utils import secure_filename
@@ -382,8 +391,9 @@ def upload_result_file(adm_no):
 
 
 # --------- Letters ----------
+# --------- Letters ----------
 @app.route('/letter/<adm_no>', methods=['GET', 'POST'])
-def letter(adm_no):  # renamed from view_letter
+def letter(adm_no):
     student = students_data.get(adm_no)
     if not student:
         flash('Student not found', 'error')
@@ -395,11 +405,11 @@ def letter(adm_no):  # renamed from view_letter
         count = 0
         for file in files:
             name = (file.filename or '').lower()
-            if name.endswith(('.pdf', '.doc', '.docx', '.txt')):
+            if name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
                 upload = cloudinary.uploader.upload(
                     file,
-                    folder=f"letters/{adm_no}/",
-                    resource_type='raw',
+                    folder=f"letters/{adm_no}/",   # Store in "letters" folder per student
+                    resource_type='image'          # Ensure treated as image
                 )
                 add_upload(
                     adm_no,
@@ -411,13 +421,14 @@ def letter(adm_no):  # renamed from view_letter
                 )
                 count += 1
         if count:
-            flash(f"{count} letter(s) uploaded successfully.", 'success')
+            flash(f"{count} image letter(s) uploaded successfully.", 'success')
         else:
-            flash('No valid letter files uploaded', 'error')
-        return redirect(url_for('letter', adm_no=adm_no))  # updated
+            flash('No valid image files uploaded. Allowed: JPG, PNG, GIF, WEBP.', 'error')
+        return redirect(url_for('letter', adm_no=adm_no))
 
     letters = get_uploads(adm_no, 'letter')
     return render_template('letter.html', student=student, letters=letters)
+
 
 # --------- Delete Cloudinary + DB ----------
 @app.route('/delete_file', methods=['POST'])
@@ -447,6 +458,41 @@ def delete_file():
 @app.route('/departments')
 def departments():
     return render_template('department/department.html')
+@app.route("/about")
+def about():
+    return render_template("about.html")
+@app.route("/students_chart.png")
+def students_chart():
+    # Load student data
+    df = pd.read_csv("students.csv")  # or fetch from SQLite if you prefer
+
+    # Count per department
+    dept_counts = df["Department"].value_counts()
+
+    # Generate Pie Chart
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.pie(dept_counts, labels=dept_counts.index, autopct='%1.1f%%', startangle=140)
+    ax.set_title("Sponsored Students per Department")
+
+    # Save to BytesIO
+    img = io.BytesIO()
+    plt.savefig(img, format="png", bbox_inches="tight")
+    img.seek(0)
+    plt.close(fig)
+
+    return Response(img.getvalue(), mimetype="image/png")
+
+#@app.route("/contact", methods=["GET", "POST"])
+#def contact():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+        # TODO: send email or save message
+        flash("Thank you for contacting us!", "success")
+        return redirect(url_for("contact"))
+    return render_template("coontact.html")
+
 
 
 @app.route('/department/<dept_name>', methods=['GET', 'POST'])

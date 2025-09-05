@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Page Heading -->
+  <h1 class="text-center mb-4">About Us</h1>
+
+  <!-- Intro Section -->
+  <p class="lead text-center">
+    Daisy Sponsorship Program connects kind sponsors with talented students 
+    across different departments. Each group nurtures future leaders 
+    through education, mentorship, and community support.
+  </p>
+
+  <!-- Pie Chart Section -->
+  <div class="text-center my-5">
+<div class="text-center my-5">
+  <h3 class="mb-3">Sponsored Students per Department</h3>
+  <img src="{{ url_for('students_chart') }}" 
+       alt="Students per Department Chart" 
+       class="img-fluid rounded shadow">
+</div>
+
+  </div>
+
+  <!-- Mission Section -->
+  <div class="row mt-5">
+    <div class="col-md-6">
+      <h4>Our Mission</h4>
+      <p>
+        To ensure that every student has access to quality education regardless of their background. 
+        We work with international and local partners to provide educational sponsorships, 
+        mentorship, and holistic growth.
+      </p>
+    </div>
+    <div class="col-md-6">
+      <h4>Our Vision</h4>
+      <p>
+        A future where every learner can pursue their dreams and contribute positively to society. 
+        We believe in education as the foundation for lifelong success and empowerment.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

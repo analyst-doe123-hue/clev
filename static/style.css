@@ -25,6 +25,7 @@ body {
 .navbar .navbar-brand,
 .navbar .nav-link {
     color: white !important;
+    font-weight: 500;
 }
 .navbar .nav-link:hover {
     color: var(--accent) !important;
@@ -43,19 +44,13 @@ h1, h2, h3, h4 {
 /* =======================
    Buttons
 ========================== */
-.btn-primary {
-    background-color: var(--maroon);
-    border: none;
-}
-.btn-primary:hover {
-    background-color: var(--light-maroon);
-}
-
+.btn-primary,
 .btn-maroon {
     background-color: var(--maroon);
-    color: white;
     border: none;
+    color: white;
 }
+.btn-primary:hover,
 .btn-maroon:hover {
     background-color: var(--light-maroon);
     color: white;
@@ -71,15 +66,14 @@ h1, h2, h3, h4 {
     color: white;
 }
 
-/* Floating Button */
+/* Floating Button (general use) */
 .btn-floating {
     background-color: var(--maroon);
     color: white;
     border-radius: 50%;
-    padding: 20px;
-    margin: 10px;
-    width: 60px;
-    height: 60px;
+    padding: 18px;
+    width: 55px;
+    height: 55px;
     font-size: 16px;
     display: inline-flex;
     justify-content: center;
@@ -145,10 +139,10 @@ form label {
     text-decoration: none;
     color: white;
     background-color: var(--maroon);
-    padding: 15px 25px;
+    padding: 14px 26px;
     border-radius: 50px;
     transition: 0.3s ease-in-out;
-    font-weight: bold;
+    font-weight: 600;
 }
 .department-buttons a:hover {
     background-color: var(--light-maroon);
@@ -162,7 +156,8 @@ footer {
     background-color: var(--maroon);
     color: white;
     text-align: center;
-    padding: 20px 10px;
+    padding: 18px 10px;
+    font-size: 14px;
 }
 
 /* =======================
@@ -182,9 +177,97 @@ footer {
     box-shadow: 0 2px 8px rgba(128, 0, 0, 0.3);
 }
 .toast .btn-close {
-    color: white;
     filter: invert(1);
 }
+
+/* =======================
+   Slider (Homepage)
+========================== */
+.slider {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    overflow: hidden;
+    margin: 30px 0;
+}
+
+.slides {
+    display: flex;
+    height: 100%;
+    transition: transform 1s ease-in-out;
+}
+
+.slide {
+    flex: 0 0 100%;  /* each slide takes full width */
+    height: 100%;
+    position: relative;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.caption {
+    position: absolute;
+    bottom: 20px;
+    left: 30px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.2em;
+}
+
+.indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.indicator.active {
+    opacity: 1;
+}
+
+
+/* =======================
+   Social Media Sidebar
+========================== */
+.social-sidebar {
+    position: fixed;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+}
+.social-sidebar a {
+    color: white;
+    padding: 12px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 18px;
+    transition: 0.3s;
+}
+.social-sidebar a.facebook { background: #3b5998; }
+.social-sidebar a.instagram { background: #E4405F; }
+.social-sidebar a.youtube { background: #FF0000; }
+.social-sidebar a:hover { opacity: 0.8; }
 
 /* =======================
    Responsive Design
@@ -193,58 +276,25 @@ footer {
     .btn-floating {
         width: 50px;
         height: 50px;
-        padding: 15px;
+        padding: 14px;
         font-size: 14px;
     }
-
     .department-buttons {
         flex-direction: column;
         align-items: center;
     }
-}
-/* WhatsApp Button */
-.btn-whatsapp {
-  display: inline-block;
-  background-color: #25D366;
-  color: white;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.3s;
+    .slider {
+        height: 40vh;
+    }
+    .caption {
+        font-size: 1em;
+        padding: 8px 15px;
+    }
 }
 
-.btn-whatsapp:hover {
-  background-color: #1DA851;
-}
-
-/* Contact Form */
-.contact-form {
-  max-width: 500px;
-  margin: 20px auto;
-}
-
-.contact-form .form-control {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.btn-submit {
-  background-color: maroon;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.btn-submit:hover {
-  background-color: #8b0000;
-}
-/* Floating WhatsApp Button */
+/* =======================
+   WhatsApp Button
+========================== */
 .whatsapp-float {
   position: fixed;
   width: 55px;
@@ -254,17 +304,15 @@ footer {
   background-color: #25D366;
   color: white;
   border-radius: 50%;
-  text-align: center;
-  font-size: 28px;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: background 0.3s;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: background 0.3s, transform 0.2s;
 }
-
 .whatsapp-float:hover {
   background-color: #1DA851;
+  transform: scale(1.1);
 }
