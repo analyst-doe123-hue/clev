@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentIndex = 0;
     const totalSlides = slideElements.length;
 
-    // Create indicators dynamically
+    // Create indicators dynamically for all slides
     slideElements.forEach((_, index) => {
         const indicator = document.createElement("div");
         indicator.classList.add("indicator");
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Auto-slide every 5 seconds
+    // Auto-slide infinitely
     setInterval(() => {
         currentIndex = (currentIndex + 1) % totalSlides;
         goToSlide(currentIndex);
