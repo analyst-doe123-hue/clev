@@ -481,6 +481,14 @@ def students_chart():
     plt.close(fig)
 
     return Response(img.getvalue(), mimetype="image/png")
+@app.route('/team')
+def team():
+    return render_template('team.html')
+
+@app.route('/success')
+def success():
+    return render_template('success.html')
+
 
 #@app.route("/contact", methods=["GET", "POST"])
 #def contact():

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Our Team | Daisy Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="text-center text-maroon fw-bold mb-5">Meet Our Team</h1>
+
+  <div class="row g-4">
+    <div class="col-md-4 text-center">
+      <img src="{{ url_for('static', filename='images/team1.jpg') }}" 
+           class="rounded-circle mb-3 shadow" 
+           style="width:160px;height:160px;object-fit:cover;" 
+           alt="Daisy">
+      <h5 class="fw-bold">Carolyne Daisy</h5>
+      <p class="text-muted">Program Director</p>
+    </div>
+
+    <div class="col-md-4 text-center">
+      <img src="{{ url_for('static', filename='images/team2.jpg') }}" 
+           class="rounded-circle mb-3 shadow" 
+           style="width:160px;height:160px;object-fit:cover;" 
+           alt="Clevicks">
+      <h5 class="fw-bold">Clevicks Indiatsi</h5>
+      <p class="text-muted">Coordinator</p>
+    </div>
+
+    <div class="col-md-4 text-center">
+      <img src="{{ url_for('static', filename='images/team3.jpg') }}" 
+           class="rounded-circle mb-3 shadow" 
+           style="width:160px;height:160px;object-fit:cover;" 
+           alt="Mary Johnson">
+      <h5 class="fw-bold">Mary Johnson</h5>
+      <p class="text-muted">Mentorship Lead</p>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-4">
+    <div class="col-md-4 text-center">
+      <img src="{{ url_for('static', filename='images/team4.jpg') }}" 
+           class="rounded-circle mb-3 shadow" 
+           style="width:160px;height:160px;object-fit:cover;" 
+           alt="team HUG">
+      <h5 class="fw-bold">HUG</h5>
+      <p class="text-muted">Finance & Sponsorships</p>
+    </div>
+
+    <div class="col-md-4 text-center">
+      <img src="{{ url_for('static', filename='images/team5.jpg') }}" 
+           class="rounded-circle mb-3 shadow" 
+           style="width:160px;height:160px;object-fit:cover;" 
+           alt="gaylordvedelndenga">
+      <h5 class="fw-bold">Gaylord Ndenga</h5>
+      <p class="text-muted">Student Engagement</p>
+    </div>
+
+    <div class="col-md-4 text-center">
+      <img src="{{ url_for('static', filename='images/team6.jpg') }}" 
+           class="rounded-circle mb-3 shadow" 
+           style="width:160px;height:160px;object-fit:cover;" 
+           alt="Clevicks">
+      <h5 class="fw-bold">Clevicks Indiatsi</h5>
+      <p class="text-muted">Community Outreach</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
