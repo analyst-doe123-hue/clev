@@ -316,3 +316,41 @@ footer {
   background-color: #1DA851;
   transform: scale(1.1);
 }
+/* Sidebar container */
+.social-sidebar {
+  position: fixed;
+  top: 40%;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 999;
+}
+
+/* Sidebar buttons */
+.social-sidebar a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Brand-specific colors */
+.social-sidebar a.facebook { background: #006AFF; }
+.social-sidebar a.instagram { background: #E4405F; }
+.social-sidebar a.whatsapp { background: #25D366; }
+.social-sidebar a.youtube { background: #FF0000; }
+
+/* Hover effect */
+.social-sidebar a:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+}
+
